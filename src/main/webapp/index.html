@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--
+Success! Your submission appears on this page.
+The submission confirmation number is 9bcc3250-0095-4e3e-9df6-1a451cb040ad.
+Copy and save this number as proof of your submission.
+-->
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+        <script>
+            function messageReceived(response) {
+                //Take the message and append it to the message div container
+                let message = JSON.parse(response.data);
+                let messageDiv = document.createElement('div');
+                messageDiv.innerHTML = message.createdDate + ' - ' + message.author + ': ' + message.text;
+                
+                $('#chatMessages').append(messageDiv);
+                
+            }
+            
+            //fires after the page is rendered
+            $(document).ready(function(){
+                const socket = new WebSocket("ws://localhost:8080/Week11_WebSocket/chat");
+                socket.onmessage = messageReceived;
+                
+                $('#submit').click(function(){
+                    let messageText = $('#textMessage').val();
+                    let author = $('#author').val();
+                    const action = 'send';
+                    
+                    let messageObject = { action: action, text: messageText, author: author };
+                    socket.send(JSON.stringify(messageObject));
+                })
+                $('#allMessages').click(function(){
+                    let messageText = $('#textMessage').val();
+                    let author = $('#author').val();
+                    const action = 'list';
+                    
+                    let messageObject = { action: action, text: messageText, author: author };
+                    socket.send(JSON.stringify(messageObject));
+                })
+            })
+            
+        </script>
+    </head>
+    <body>
+        <h1>Chat</h1>
+        <div>
+            <input type="text" id="textMessage" placeholder="message" />
+            <input type="text" id="author" placeholder="author" />
+            <input type="submit" id="submit" value="Send Message" />
+            <input type="button" id="allMessages" value="Message History" />
+        </div>
+        <div id="chatMessages"></div>
+    </body>
+</html>
